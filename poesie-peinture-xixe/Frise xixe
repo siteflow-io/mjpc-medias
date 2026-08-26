@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La frise du XIXe siècle</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;background:#FBF7EF;
+    font-family:Garamond,'EB Garamond',Georgia,serif;color:#1C1C1C}
+  #scene{height:100%;display:flex;flex-direction:column;padding:1.6vh 2vw 0}
+
+  header{flex:none;display:flex;align-items:baseline;gap:1.2vw;margin-bottom:.8vh}
+  h1{font-size:clamp(20px,3.4vh,32px);font-weight:700}
+    .sous{font-size:clamp(14px,2.2vh,20px);color:#6B5B3E;font-style:italic}
+
+  #cadre{flex:1;position:relative;min-height:0}
+    .titreB{position:absolute;left:0;font-size:clamp(13px,1.9vh,17px);letter-spacing:.08em;
+    text-transform:uppercase;color:#8A7A5A;font-family:system-ui,sans-serif;
+    background:#FBF7EF;padding-right:.6vw;z-index:3}
+
+  /* l'axe */
+  #axe{position:absolute;left:0;right:0;top:50%;height:2px;background:#1C1C1C}
+    .grad{position:absolute;top:50%;width:1px;height:8px;background:#8A7A5A;transform:translateY(0)}
+  .grad.dix{height:12px;background:#1C1C1C}
+    .an{position:absolute;top:calc(50% + 10px);transform:translateX(-50%);
+    font-size:clamp(14px,2vh,18px);color:#4A3A1F;font-family:system-ui,sans-serif}
+
+  /* une vie de poète : un trait + un nom */
+    .vie{position:absolute;height:2.6%;display:flex;align-items:center;
+    opacity:0;transform:translateY(6px);transition:opacity .45s ease,transform .45s ease}
+  .vie.on{opacity:1;transform:none}
+  .trait{position:absolute;left:0;right:0;top:50%;height:3px;background:#1F4E9C;border-radius:2px}
+  .pt{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;background:#1F4E9C;
+    transform:translate(-50%,-50%)}
+    .nom{position:absolute;left:0;top:-2.5vh;white-space:nowrap;
+    font-size:clamp(16px,2.5vh,24px);font-weight:700;color:#1F4E9C}
+  .dates{font-weight:400;color:#5B6672;font-size:.78em}
+  .attache{position:absolute;width:0;border-left:1px dotted #1F4E9C;opacity:.42;top:50%}
+  .vie.phare .attache{border-left-color:#B3261E}
+  /* mise en scène finale : le reste s'estompe */
+  .focus .vie:not(.phare),.focus .periode.on,.focus .inv.on,.focus .titreB,.focus .an,.focus .grad{opacity:.14 !important}
+  .focus #axe{opacity:.35}
+  .focus .vie.phare{opacity:1}
+  .fam-p .trait,.fam-p .pt{background:#7A5CA8}
+  .fam-p .nom{color:#7A5CA8}
+  .fam-p .attache{border-left-color:#7A5CA8}
+  .vie.phare .trait,.vie.phare .pt{background:#B3261E}
+  .vie.phare .nom{color:#B3261E}
+
+  /* Histoire et inventions */
+  .periode{position:absolute;height:3.4%;background:#E7E0D0;border:1px solid #C9BFA6;
+    border-radius:3px;display:flex;align-items:center;justify-content:center;
+    font-size:clamp(13px,1.95vh,18px);white-space:nowrap;padding:0 .4vw;
+    opacity:0;transition:opacity .45s ease}
+  .periode.on{opacity:1}
+  .periode.etroite{overflow:visible}
+  .periode.etroite span{position:absolute;bottom:calc(100% + 2px);left:50%;transform:translateX(-50%);
+    white-space:nowrap;background:#FBF7EF;padding:0 .2vw}
+  .periode.etroite.bord span{left:0;transform:none}
+  .inv{position:absolute;display:flex;flex-direction:column;align-items:center;
+    opacity:0;transform:translateY(-6px);transition:opacity .45s ease,transform .45s ease}
+  .inv.on{opacity:1;transform:none}
+  .inv .tige{width:1px;height:2.6vh;background:#2E6B3E}
+  .inv .rappel{position:absolute;left:50%;bottom:calc(100% - 5px);width:1px;background:#2E6B3E;opacity:.32}
+  .inv .rond{width:10px;height:10px;border-radius:50%;background:#2E6B3E}
+  .inv .lab{margin-top:.3vh;font-size:clamp(14px,2.1vh,19px);color:#2E6B3E;
+    text-align:center;font-weight:700;line-height:1.15;max-width:22cqw}
+
+  #cit{position:absolute;left:0;right:0;top:86%;padding:.4vh 1cqw;text-align:center;
+    background:#FBF7EF;border-radius:6px;
+    opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s ease;z-index:4}
+  #cit.on{opacity:1;transform:none}
+  #citT{font-size:clamp(20px,3.4vh,34px);font-style:italic;color:#1C1C1C;line-height:1.2}
+  #citE{font-size:clamp(15px,2.3vh,21px);color:#5B6672;margin-top:.6vh;line-height:1.25}
+  footer{flex:none;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.4vh 1.2vw;
+    padding:.8vh 0 1.2vh;font-family:system-ui,sans-serif;font-size:clamp(12px,1.8vh,15px);color:#6B5B3E}
+  #etape{font-weight:700;color:#1C1C1C}
+  kbd{border:1px solid #C9BFA6;border-radius:4px;padding:1px 6px;background:#fff}
+  #legende{display:flex;gap:1.4vw;align-items:center;flex-wrap:wrap}
+  .pastille{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:.3vw}
+</style>
+</head>
+<body>
+<div id="scene">
+  <header>
+    <h1>La frise du XIX<sup>e</sup> siècle</h1>
+    <span class="sous">l'Histoire, les poètes, les inventions</span>
+  </header>
+
+  <div id="cadre">
+    <div class="titreB" style="top:0.5%">Les poètes</div>
+    <div class="titreB" style="top:55.5%">L'Histoire</div>
+    <div class="titreB" style="top:74%">Les inventions</div>
+    <div id="axe"></div>
+    <div id="cit"><div id="citT"></div><div id="citE"></div></div>
+  </div>
+
+    <footer>
+    <div id="legende">
+      <span><span class="pastille" style="background:#1F4E9C"></span>romantique</span>
+      <span><span class="pastille" style="background:#7A5CA8"></span>parnassien</span>
+      <span id="legBau" style="opacity:.28"><span class="pastille" style="background:#B3261E"></span>Baudelaire</span>
+      <span><span class="pastille" style="background:#2E6B3E"></span>invention</span>
+    </div>
+    <div><span id="etape">0 / 17</span> &nbsp;·&nbsp; <kbd>→</kbd> avancer &nbsp; <kbd>←</kbd> revenir &nbsp; <kbd>Début</kbd> tout effacer</div>
+  </footer>
+</div>
+
+<script>
+const AN0 = 1784, AN1 = 1908;                     // amplitude de l'axe
+const x = a => Math.max(0, Math.min(100, (a - AN0) / (AN1 - AN0) * 100));     // année → pourcentage
+
+const POETES = [
+  ['Lamartine',1790,1869,'r'], ['Vigny',1797,1863,'r'], ['Hugo',1802,1885,'r'],
+  ['Musset',1810,1857,'r'], ['Gautier',1811,1872,'p'], ['Leconte de Lisle',1818,1894,'p'],
+  ['Baudelaire',1821,1867,'b'], ['Banville',1823,1891,'p'], ['Heredia',1842,1905,'p']
+];
+const CITATIONS = {
+  'Lamartine':  ['« Ô temps, suspends ton vol ! »',
+                 'Le Lac, 1820 — il parle au temps comme à une personne : ses sentiments deviennent le sujet du poème.'],
+  'Vigny':      ['« Seul le silence est grand ; tout le reste est faiblesse. »',
+                 'La Mort du loup — romantique par la douleur, mais chez lui la souffrance se tait.'],
+  'Hugo':       ['« Quand je vous parle de moi, je vous parle de vous. »',
+                 'Les Contemplations, 1856 — le romantisme à son sommet : parler de soi, c\'est parler de tous.'],
+  'Musset':     ['« Les plus désespérés sont les chants les plus beaux. »',
+                 'La Nuit de mai, 1835 — le romantisme jusqu\'au bout : plus il souffre, plus il écrit.'],
+  'Gautier':    ['« Sculpte, lime, cisèle. »',
+                 'L\'Art, 1852 — il tourne le dos au romantisme : ce n\'est plus le cœur qui compte, c\'est le travail de la forme.'],
+  'Leconte de Lisle': ['« Midi, roi des étés, épandu sur la plaine »',
+                 'Poèmes antiques, 1852 — le contraire du romantisme : le mot « je » a disparu du poème.'],
+  'Baudelaire': ['« Ses ailes de géant l\'empêchent de marcher. »',
+                 'L\'Albatros, 1861 — il garde la souffrance des romantiques, dans la forme parfaite des parnassiens.'],
+  'Banville':   ['« Jouer du violon debout sur l\'échelle du saltimbanque ! »',
+                 'Odes funambulesques, 1857 — loin du poète qui raconte sa vie : écrire devient un exercice d\'équilibriste.'],
+  'Heredia':    ['« Comme un vol de gerfauts hors du charnier natal »',
+                 'Les Trophées, 1893 — aucun sentiment personnel : le poème est travaillé comme un bijou.']
+};
+
+const HISTOIRE = [
+  ['Révolution française',1789,1799], ['Empire, puis monarchies',1804,1848],
+  ['II\u1d49 République',1848,1851], ['Second Empire',1852,1870],
+  ['III\u1d49 République',1871,1910]
+];
+const INVENTIONS = [
+  ['La photographie',1816], ['Le télégraphe',1832], ['Le téléphone',1876]
+];
+
+const cadre = document.getElementById('cadre');
+function majAttaches(){
+  const h = cadre.clientHeight;
+  document.querySelectorAll('.vie').forEach(v => {
+    const y = v.offsetTop + v.offsetHeight / 2;      // milieu du trait de vie
+    const hauteur = Math.max(0, h * 0.5 - y);        // distance jusqu'à l'axe
+    v.querySelectorAll('.attache').forEach(a => {
+      a.style.height = hauteur + 'px';
+      a.style.left = a.dataset.bord === '0' ? '0' : '100%';
+    });
+  });
+}
+window.addEventListener('resize', majAttaches);
+function majRappels(){ const h=cadre.clientHeight; document.querySelectorAll('.inv .rappel').forEach(r=>{ r.style.height=(h*0.29)+'px'; }); }
+window.addEventListener('resize', majRappels);
+
+/* graduations */
+for (let a = 1790; a <= 1900; a += 10) {
+  const g = document.createElement('div');
+  g.className = 'grad dix'; g.style.left = x(a) + '%';
+  cadre.appendChild(g);
+  const t = document.createElement('div');
+  t.className = 'an'; t.style.left = x(a) + '%'; t.textContent = a;
+  cadre.appendChild(t);
+}
+
+const etapes = [];
+
+/* l'Histoire */
+HISTOIRE.forEach(([lab, a, b], i) => {
+  const d = document.createElement('div');
+  d.className = 'periode';
+  const largeur = x(b) - x(a);
+  d.style.left = x(a) + '%'; d.style.width = largeur + '%';
+  d.style.top = (63.5 + (i % 2) * 5.6) + '%';
+  if (largeur < 9) { d.classList.add('etroite'); if (x(a) < 12) d.classList.add('bord');
+                     d.innerHTML = '<span>' + lab + '</span>'; }
+  else d.innerHTML = lab;
+  cadre.appendChild(d); etapes.push(d);
+});
+
+/* les vies : réparties sur la bande haute, sans se chevaucher */
+POETES.forEach(([nom, n, m, fam], i) => {
+  const d = document.createElement('div');
+  d.className = 'vie fam-' + fam;
+  if (nom === 'Baudelaire') d.id = 'baudelaire';
+  d.style.left = x(n) + '%';
+  d.style.width = (x(m) - x(n)) + '%';
+  d.style.top = (7 + i * 4.8) + '%';
+  d.innerHTML = '<div class="attache" data-bord="0"></div><div class="attache" data-bord="1"></div>' +
+                '<div class="trait"></div><div class="pt" style="left:0"></div>' +
+                '<div class="pt" style="left:100%"></div>' +
+                '<div class="nom">' + nom + ' <span class="dates">' + n + '-' + m + '</span></div>';
+  cadre.appendChild(d);
+  etapes.push(d);                       // pas 1 : la ligne du poète
+  etapes.push({ citation: nom });        // pas 2 : sa citation
+});
+
+/* les inventions */
+let precX = -99, etage = 0;
+INVENTIONS.forEach(([lab, a]) => {
+  const d = document.createElement('div');
+  d.className = 'inv';
+  /* deux repères trop proches : le second descend d'un étage */
+  etage = (x(a) - precX < 16) ? 1 - etage : 0;
+  precX = x(a);
+  d.style.left = x(a) + '%'; d.style.top = (79 + etage * 9) + '%'; d.style.transform = 'translateX(-50%)';
+  d.querySelector('.rappel') && 0;
+  d.innerHTML = '<div class="rappel"></div><div class="rond"></div><div class="tige"></div>' +
+                '<div class="lab">' + lab + '<br><span style="font-weight:400">' + a + '</span></div>';
+  cadre.appendChild(d);
+  d.querySelector('.rappel').style.height = 'calc(29% * var(--h, 1))';
+  etapes.push(d);
+});
+
+let n = 0;
+const compteur = document.getElementById('etape');
+const bau = () => document.getElementById('baudelaire');
+function rendre() {
+  etapes.forEach((el, i) => { if (el.classList) el.classList.toggle('on', i < n); });
+  /* Baudelaire ne rougit qu'à la toute dernière étape : la classe le découvre */
+  const reveal = n > etapes.length;
+  bau().classList.toggle('phare', reveal);
+  document.body.classList.toggle('focus', reveal);
+  const zone = document.getElementById('cit');
+  const dernier = etapes[n - 1];
+  const nomP = (n > etapes.length) ? 'Baudelaire'
+    : (dernier && dernier.citation ? dernier.citation : null);
+  if (nomP && CITATIONS[nomP]) {
+    document.getElementById('citT').textContent = CITATIONS[nomP][0];
+    document.getElementById('citE').textContent = CITATIONS[nomP][1];
+    zone.classList.add('on');
+  } else zone.classList.remove('on');
+  document.getElementById('legBau').style.opacity = n > etapes.length ? 1 : .28;
+  const total = etapes.filter(e => e.classList).length;
+  const faits = etapes.slice(0, Math.min(n, etapes.length)).filter(e => e.classList).length;
+  compteur.textContent = faits + ' / ' + total +
+    (n > etapes.length ? '  ·  Baudelaire' : '');
+}
+function avancer(d) { n = Math.max(0, Math.min(etapes.length + 1, n + d)); rendre(); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { avancer(1); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { avancer(-1); e.preventDefault(); }
+  else if (e.key === 'Home') { n = 0; rendre(); }
+  else if (e.key === 'End') { n = etapes.length + 1; rendre(); }
+});
+document.addEventListener('click', e => avancer(e.clientX < window.innerWidth / 4 ? -1 : 1));
+rendre();
+majRappels();
+majAttaches();
+</script>
+</body>
+</html>
